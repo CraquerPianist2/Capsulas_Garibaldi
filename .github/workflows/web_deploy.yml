@@ -4,11 +4,13 @@ on:
   push:
     branches: [ main, master ]
 
+# Esto le da explícitamente permiso de escritura al token de GitHub
+permissions:
+  contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Descargar Código
         uses: actions/checkout@v4
@@ -22,11 +24,15 @@ jobs:
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # Tarea de Gradle que genera los archivos listos para la web
+      # --- AQUÍ ESTÁ LA SOLUCIÓN ---
+      - name: Dar permisos de ejecucion a gradlew
+        run: chmod +x ./gradlew
+
+      # Ahora ya no dará "Permission denied"
       - name: Compilar Web (Production Distribution)
         run: ./gradlew :app:wasmJsBrowserDistribution
 
-      # Publica la carpeta generada directamente en la rama gh-pages
+      # Publicar la carpeta generada en gh-pages
       - name: Desplegar en GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
