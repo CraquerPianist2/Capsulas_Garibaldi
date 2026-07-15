@@ -1,36 +1,39 @@
-name: Compilar App para iOS
+name: iOS Build (Simulator)
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: macos-latest
+
     steps:
-      - name: Descargar Codigo
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configurar Java (JDK 17)
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
           java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@v3
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: Dar permisos de ejecucion a gradlew
-        run: chmod +x ./gradlew
+      - name: Build iOS Simulator Framework
+        # Usamos el nombre exacto de la tarea generado por KMP
+        run: ./gradlew :app:linkDebugFrameworkIosSimulatorArm64
 
-      # === USAMOS EL MÓDULO CORRECTO (:app) ===
-      # Compilamos la tarea de iOS usando la arquitectura estándar del simulador
-      - name: Compilar framework de iOS
-        run: ./gradlew :app:assembleDebugIosSimulatorFramework
-
-      - name: Guardar ejecutable compilado
+      - name: Upload iOS Framework Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: App-iOS-Compilada
-          # Guardamos la salida generada dentro de la carpeta build del módulo ':app'
-          path: app/build/outputs/
+          name: ios-framework-debug
+          path: |
+            app/build/bin/iosSimulatorArm64/debugFramework/
+            app/build/fat-framework/debug/
+          if-no-files-found: warn
