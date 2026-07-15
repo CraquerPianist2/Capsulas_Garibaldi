@@ -14,6 +14,22 @@ kotlin {
         }
     }
 
+    @OptIn(org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "composeApp"
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+                devServer = (devServer ?: org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        add(project.projectDir.path + "/src/wasmJsMain/resources")
+                    }
+                }
+            }
+        }
+        binaries.executable()
+    }
+
     // Configuración para generar el XCFramework
     val xcf = XCFramework("SharedFramework")
     
