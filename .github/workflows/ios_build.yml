@@ -2,7 +2,7 @@ name: Compilar App para iOS
 
 on:
   push:
-    branches: [ main, master ] # Se activa al subir cambios a la rama principal
+    branches: [ main, master ]
 
 jobs:
   build:
@@ -20,15 +20,17 @@ jobs:
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # === ESTE PASO NUEVO SOLUCIONA TU ERROR ===
       - name: Dar permisos de ejecucion a gradlew
         run: chmod +x ./gradlew
 
+      # === USAMOS EL MÓDULO CORRECTO (:app) ===
+      # Compilamos la tarea de iOS usando la arquitectura estándar del simulador
       - name: Compilar framework de iOS
-        run: ./gradlew :composeApp:assembleDebugIosSimulatorFramework
+        run: ./gradlew :app:assembleDebugIosSimulatorFramework
 
       - name: Guardar ejecutable compilado
         uses: actions/upload-artifact@v4
         with:
           name: App-iOS-Compilada
-          path: composeApp/build/ # Guarda la salida del build de iOS
+          # Guardamos la salida generada dentro de la carpeta build del módulo ':app'
+          path: app/build/outputs/
