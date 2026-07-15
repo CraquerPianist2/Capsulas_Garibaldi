@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.application)
@@ -11,6 +13,9 @@ kotlin {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
+
+    // Configuración para generar el XCFramework
+    val xcf = XCFramework("SharedFramework")
     
     listOf(
         iosX64(),
@@ -18,7 +23,8 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "app"
+            baseName = "ComposeApp" // Nombre que buscará Xcode
+            xcf.add(this)
             isStatic = true
         }
     }
