@@ -20,6 +20,10 @@ jobs:
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      # === ESTE PASO NUEVO SOLUCIONA TU ERROR ===
+      - name: Dar permisos de ejecucion a gradlew
+        run: chmod +x ./gradlew
+
       - name: Compilar framework de iOS
         run: ./gradlew :composeApp:assembleDebugIosSimulatorFramework
 
