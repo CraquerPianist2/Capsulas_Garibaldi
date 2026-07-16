@@ -1,0 +1,11 @@
+- `[x]` Prepare directory structure in `commonMain`
+- `[x]` Migrate images to `commonMain/composeResources/drawable`
+- `[x]` Move and adapt Theme to `commonMain`
+    - `[x]` Move `Color.kt` and `Type.kt`
+    - `[x]` Move and adapt `Theme.kt` (platform-independent)
+- `[x]` Create shared UI in `App.kt` (`commonMain`)
+- `[x]` Refactor `MainActivity.kt` (`androidMain`)
+- `[x]` Refactor `main.kt` (`wasmJsMain`)
+- `[x]` Verify compilation
+    - `[x]` Android
+    - `[x]` WASM
