@@ -4,14 +4,22 @@ on:
   push:
     branches: [ main, master ]
 
-# Permisos necesarios para el despliegue
+# Permisos necesarios para el despliegue con GitHub Actions
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
+# Permite una sola ejecución simultánea para no pisar despliegues
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Descargar Código
@@ -26,18 +34,18 @@ jobs:
       - name: Configurar Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # --- AQUÍ ESTÁ LA SOLUCIÓN ---
       - name: Dar permisos de ejecucion a gradlew
         run: chmod +x ./gradlew
 
-      # Ahora ya no dará "Permission denied"
       - name: Compilar Web (Production Distribution)
         run: ./gradlew :app:wasmJsBrowserDistribution
 
-      # Publicar la carpeta generada en gh-pages
-      - name: Desplegar en GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Subir artefacto de Pages
+        uses: actions/upload-pages-artifact@v3
         with:
-          folder: app/build/dist/wasmJs/productionExecutable
-          branch: gh-pages
-          clean: true
+          # Ruta a la carpeta que contiene el index.html
+          path: 'app/build/dist/wasmJs/productionExecutable'
+
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
